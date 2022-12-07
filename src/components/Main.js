@@ -13,6 +13,7 @@ export const Main = ({
 
 	// подписка на контекст
 	const user = useContext(CurrentUserContext)
+
 	return (
 		<main className="content">
 			<section className="profile">

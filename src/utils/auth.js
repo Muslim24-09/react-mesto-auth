@@ -1,67 +1,54 @@
-//const authData = {
-	//baseUrl: 'https://auth.nomoreparties.co',
-	//headers: {
-	//	'Content-Type': 'application/json',
-	//}
-//}
+const BASE_URL = 'https://auth.nomoreparties.co';
 
-class Auth {
-	_baseUrl;
-
-	constructor({ baseUrl }) {
-		this._baseUrl = baseUrl;
-
-	}
-
-	_checkResponse(res) {
-		if (res.ok) {
-			return res.json()
-		} else {
-			console.log(101010, res);
-			return Promise.reject(`Ошибка: ${res.status}`)
-		}
-	}
-
-	register(data) {
-    return fetch(`${this._baseUrl}/signup`, {
-      method: 'POST',
-      //headers: this._headers,
-			headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        password: data.password,
-        email: data.email
-      })
-    }).then(this._checkResponse)
-		.then((res) => console.log(999, res))
+function checkResponse(res) {
+  if (res.ok) {
+    return res.json();
   }
-
-	authorize(data) {
-    return fetch(`${this._baseUrl}/signin`, {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        password: data.password,
-        email: data.email
-      })
-    }).then(this._checkResponse)
-		.then((res) => console.log(888, res))
-  }
-
-  checkToken(token) {
-    return fetch(`${this._baseUrl}/users/me`, {
-      method: 'GET',
-      headers: {
-				"Content-Type": "application/json",
-				"Authorization" : `Bearer ${token}`
-		} 
-    }).then(this._checkResponse)
-		.then((res) => console.log(777, res))
-  }
+  return Promise.reject(`${res.status}`);
 }
 
-export const auth = new Auth({
-  baseUrl: 'https://auth.nomoreparties.co',
- // headers: {
-  //  'Content-Type': 'application/json'
- // }
-});
+export const register = ({email, password}) => {
+  return fetch(`${BASE_URL}/signup`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  })
+    .then(checkResponse)
+};
+
+export const login = ({email, password}) => {
+  return fetch(`${BASE_URL}/signin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  })
+    .then(checkResponse)
+    .then((data) => {
+      if (data.token) {
+        localStorage.setItem("jwt", data.token);
+        return data;
+      }
+    })
+};
+
+export const checkToken = (jwt) => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+  })
+    .then(checkResponse)
+};

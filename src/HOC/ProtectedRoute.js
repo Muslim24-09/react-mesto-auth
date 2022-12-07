@@ -1,12 +1,14 @@
 import React from "react";
 
-import { Outlet, Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 export const ProtectedRoute = ({ component, ...props }) => {
-	if (!props.loggedIn) {
-		return  <Navigate to="/sign-up" />
+	console.log(1, 'зашли в ProtectedRoute');
+	
+	if(!props.isLoggedIn) {
+		console.log(2, 'логин не прошел');
+		return <Navigate to="/sign-in" />
 	}
-  return (
-		component ? component : <Outlet />
-	)  
+
+	return component ? component : <Outlet />
 }
