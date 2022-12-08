@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { Main } from "./Main";
@@ -30,7 +30,7 @@ export const App = () => {
   const [isSuccessLoggedIn, setIsSuccessLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
 
-  const navigate = useNavigate();
+  const history = useHistory();
 
   // useEffect(() => {
   //   api.getAddingPictures()
@@ -47,30 +47,30 @@ export const App = () => {
 
   useEffect(() => {
     Promise.all([api.getAddingPictures(), api.getUserInfo()])
-    .then(([cardsInfo, userInfo]) => {
-      setCurrentUser(userInfo)
-      setCards(cardsInfo)
-    })
-    .catch((err) => console.log(err))
+      .then(([cardsInfo, userInfo]) => {
+        setCurrentUser(userInfo)
+        setCards(cardsInfo)
+      })
+      .catch((err) => console.log(err))
   })
 
   useEffect(() => {
     const token = localStorage.getItem("jwt")
     if (token) {
       checkToken(token)
-      .then((res) => {
-        setIsSuccessLoggedIn(true);
-        setEmail(res.data.email)
-        navigate('/')
-      })
-      .catch((err) => {
-        if (err.status === 401) {
-          console.log("401 — Токен не передан или передан не в том формате");
-        }
-        console.log("401 — Переданный токен некорректен");
-      });
+        .then((res) => {
+          setIsSuccessLoggedIn(true);
+          setEmail(res.data.email)
+          history.push('/')
+        })
+        .catch((err) => {
+          if (err.status === 401) {
+            console.log("401 — Токен не передан или передан не в том формате");
+          }
+          console.log("401 — Переданный токен некорректен");
+        });
     }
-  }, [navigate])
+  }, [history])
 
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false)
@@ -160,13 +160,13 @@ export const App = () => {
   const handleRegisterSubmit = (userData) => {
     console.log(33333, 'register --', userData);
     register(userData)
-    .then(
-      () => {
-        setIsSuccessRegister(true);
-        //handleInfoTooltipPopupOpen();
-        navigate('/sign-in')
-        console.log('потом переместить tooltip', isSuccessRegister);
-      })
+      .then(
+        () => {
+          setIsSuccessRegister(true);
+          //handleInfoTooltipPopupOpen();
+          history.push('/sign-in')
+          console.log('потом переместить tooltip', isSuccessRegister);
+        })
       .catch((err) => {
         if (err.status === 400) {
           console.log("400 - некорректно заполнено одно из полей");
@@ -175,17 +175,15 @@ export const App = () => {
         setIsSuccessRegister(false);
       });
   }
-  
+
   const handleLoginSubmit = (userData) => {
-    console.log(22222,'login --', userData);
+    console.log(22222, 'login --', userData);
     login(userData).then(
       (res) => {
-        console.log(44444, res);
         setIsSuccessLoggedIn(true);
         localStorage.setItem('jwt', res.token);
         setEmail(userData.email)
-        console.log(444, isSuccessLoggedIn);
-        navigate('/');
+        history.push('/');
       })
       .catch((err) => {
         if (err.status === 400) {
@@ -196,6 +194,12 @@ export const App = () => {
       });
   }
 
+  function handleSignOut() {
+    localStorage.removeItem("jwt");
+    setIsSuccessLoggedIn(false);
+    history.push("/sign-in");
+  }
+
 
 
 
@@ -203,26 +207,40 @@ export const App = () => {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <div className="page__container" onKeyDown={closeAllPopupsEsc} >
-        {/* path="/"   */}
-            <Header userEmail={email}/>
-            <Routes>
-              <Route path="/sign-up" element={<Register onRegister={handleRegisterSubmit} />}></Route>
-              <Route path="/sign-in" element={<Login onLogin={handleLoginSubmit}/>}></Route>
-              <Route path='/' element={<ProtectedRoute
-                path="/main"
-                component={<Main />}
-                //component={Main}
-                onEditProfile={handleEditProfileClick}
-                onAddPlace={handleAddPlaceClick}
-                onEditAvatar={handleEditAvatarClick}
-                onCardClick={handleCardClick}
-                cards={cards}
-                onCardLike={handleCardLike}
-                onDeleteCard={handlePopupSubmitOpen}
-                isLoggedIn={isSuccessLoggedIn}
-              />}></Route>
-            </Routes>
-            <Footer />
+          {/* path="/"   */}
+          <Header userEmail={email} onSignOut={handleSignOut} />
+          <Switch>
+            <Route path="/sign-up">
+              <Register
+                onRegister={handleRegisterSubmit}
+              />
+            </Route>
+            <Route path="/sign-in">
+              <Login
+                onLogin={handleLoginSubmit}
+              />
+            </Route>
+            <ProtectedRoute
+              exact
+              path="/"
+              component={Main}
+              isLoggedIn={isSuccessLoggedIn}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              cards={cards}
+              onCardLike={handleCardLike}
+              onDeleteCard={handlePopupSubmitOpen}
+            // isLoadingInitialData={isLoadingInitialData}
+            />
+            <Route>
+              {isSuccessLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            </Route>
+          </Switch>
+          
+          {isSuccessLoggedIn && <Footer />}
+
           <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
           <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
           <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />

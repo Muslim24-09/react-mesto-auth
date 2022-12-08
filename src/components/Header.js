@@ -1,36 +1,29 @@
-import { NavLink } from "react-router-dom"
+import { Link, Route, Switch } from "react-router-dom"
 
-export const Header = ({userEmail}) => {
-	const navToolbar = [
-		{
-			id: 1,
-			to: '/',
-			name: 'Home'
-		},
-		{
-			id: 2,
-			to: '/sign-up',
-			name: 'Регистрация'
-		},
-		{
-			id: 3,
-			to: '/sign-in',
-			name: 'Войти'
-		},
-	]
+export const Header = ({  userEmail, onSignOut }) => {
+
 	return (
-		<header className="header">
+		<header className="header page__header">
 			<div className="header__logo"></div>
-			<div>
-				<ul>
-					{navToolbar.map((link) => (
-						<li key={link.id}>
-							<NavLink to={link.to}>{link.name}</NavLink>
-						</li>
-					))}
-					<p>{userEmail}</p>
-				</ul>
-			</div>
+			<Switch>
+				<Route exact path="/sign-in">
+					<Link to="/sign-up" className="header__link">
+						Регистрация
+					</Link>
+				</Route>
+				<Route exact path="/sign-up">
+					<Link to="/sign-in" className="header__link">
+						Войти
+					</Link>
+				</Route>
+				<Route exact path="/">
+					<div className="header__user-info">
+						<p className="header__email">{userEmail}</p>
+						<Link to='/sign-in' className="header__link" onClick={onSignOut}>Выйти</Link>
+					</div>
+				</Route>
+			</Switch>
 		</header>
 	)
 }
+

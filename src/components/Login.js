@@ -1,20 +1,41 @@
 import React, { useState } from "react";
 import { Sign } from "./Sign";
 
-export const Login = ({onLogin, handleCheckToken }) => {
+export const Login = ({ onLogin }) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	// const [error, setError] = useState(false);
+
+	const handleChangeEmail = (e) => {
+		setEmail(e.target.value)
+	}
+	const handleChangePassword = (e) => {
+		setPassword(e.target.value)
+	}
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
-		onLogin({email, password})
+		onLogin({ email, password })
 	}
 
-	return(
-		<Sign title={'Вход'} buttonText={'Войти'} onSubmit={handleSubmit} >
-		<input type="email" value={email} onChange={(ev) => setEmail(ev.target.value)}/>
-		<input type="password" value={password} onChange={(ev) => setPassword(ev.target.value)}/>
+	return (
+		<Sign
+			btnClassName={"auth__form-submit-btn"}
+			title={'Вход'}
+			btnText={'Войти'}
+			onSubmit={handleSubmit}
+			messageIsRegistered={<></>} >
+			<input
+				className="auth__form-input"
+				type="email"
+				value={email || ''}
+				placeholder="Email"
+				onChange={handleChangeEmail} />
+			<input
+				className="auth__form-input"
+				type="password"
+				value={password || ''}
+				placeholder="Пароль"
+				onChange={handleChangePassword} />
 		</Sign>
 	)
 }
