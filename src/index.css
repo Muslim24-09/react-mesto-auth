@@ -57,6 +57,9 @@
 @import url(./blocks/popup/_blackout/popup_blackout.css);
 @import url(./blocks/popup/__close-button/_pictures/popup__close-button_pictures.css);
 @import url(./blocks/popup/__container/_delitem/popup__container_delitem.css);
+@import url(./blocks/popup/__tooltip/popup__tooltip.css);
+@import url(./blocks/popup/__tooltip/_image/popup__tooltip_image.css);
+@import url(./blocks/popup/__tooltip/_message/popup__tooltip_message.css);
 
 
 

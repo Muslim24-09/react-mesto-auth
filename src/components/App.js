@@ -14,6 +14,7 @@ import { ProtectedRoute } from "../HOC/ProtectedRoute";
 import { Login } from "./Login";
 import { Register } from "./Register";
 import { login, register, checkToken } from "../utils/auth";
+import { InfoToolTip } from './InfoTooltip';
 
 
 export const App = () => {
@@ -21,6 +22,7 @@ export const App = () => {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
   const [isPopupDeleteCardOpen, setIsPopupDeleteCardOpen] = useState(false)
+  const [isInfoToolTipOpen, setInfoToolTipOpen] = useState(false)
   const [selectedCard, setSelectedCard] = useState({})
   const [currentUser, setCurrentUser] = useState({})
   const [cards, setCards] = useState([])
@@ -78,6 +80,7 @@ export const App = () => {
     setIsAddPlacePopupOpen(false)
     setIsPopupDeleteCardOpen(false)
     setSelectedCard({})
+    setInfoToolTipOpen(false)
   }
 
   const closeAllPopupsEsc = (e) => {
@@ -158,26 +161,23 @@ export const App = () => {
   }
 
   const handleRegisterSubmit = (userData) => {
-    console.log(33333, 'register --', userData);
     register(userData)
       .then(
         () => {
           setIsSuccessRegister(true);
-          //handleInfoTooltipPopupOpen();
+          setInfoToolTipOpen(true)
           history.push('/sign-in')
-          console.log('потом переместить tooltip', isSuccessRegister);
         })
       .catch((err) => {
         if (err.status === 400) {
           console.log("400 - некорректно заполнено одно из полей");
         }
-        // setInfoToolTipPopupOpen(true);
         setIsSuccessRegister(false);
+        setInfoToolTipOpen(true)
       });
   }
 
   const handleLoginSubmit = (userData) => {
-    console.log(22222, 'login --', userData);
     login(userData).then(
       (res) => {
         setIsSuccessLoggedIn(true);
@@ -207,7 +207,6 @@ export const App = () => {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <div className="page__container" onKeyDown={closeAllPopupsEsc} >
-          {/* path="/"   */}
           <Header userEmail={email} onSignOut={handleSignOut} />
           <Switch>
             <Route path="/sign-up">
@@ -238,7 +237,7 @@ export const App = () => {
               {isSuccessLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
             </Route>
           </Switch>
-          
+
           {isSuccessLoggedIn && <Footer />}
 
           <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
@@ -250,6 +249,7 @@ export const App = () => {
             onClose={closeAllPopups}
             onDeleteCard={handleCardDelete}
             cardToDelete={itemToDelete} />
+            <InfoToolTip isOpen={isInfoToolTipOpen} onClose={closeAllPopups} isSuccess={isSuccessRegister} />
         </div>
       </div>
     </CurrentUserContext.Provider>
