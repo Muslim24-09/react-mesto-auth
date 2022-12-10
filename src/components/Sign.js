@@ -6,20 +6,20 @@ export const Sign = ({ btnClassName, title, btnText, onSubmit, messageIsRegister
 			<h2 className="auth__title">
 				{title}
 			</h2>
-		<form
-			className="auth__form"
-			noValidate
-			onSubmit={onSubmit}
-		>
-			{children}
-			<button
-			className={btnClassName}
-				type="submit"
+			<form
+				className="auth__form"
+				noValidate
+				onSubmit={onSubmit}
 			>
-				{btnText}
-			</button>
-			{messageIsRegistered && messageIsRegistered}
-		</form>
+				{children}
+				<button
+					className={btnClassName}
+					type="submit"
+				>
+					{btnText}
+				</button>
+				{messageIsRegistered && messageIsRegistered}
+			</form>
 		</section>
 	)
 }

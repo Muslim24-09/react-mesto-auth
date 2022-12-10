@@ -10,7 +10,7 @@ import { EditProfilePopup } from "./EditProfilePopup";
 import { EditAvatarPopup } from "./EditAvatarPopup";
 import { AddPlacePopup } from "./AddPlacePopup";
 import { PopupDeleteCard } from "./PopupDeleteCard";
-import { ProtectedRoute } from "../HOC/ProtectedRoute";
+import { ProtectedRoute } from "./ProtectedRoute";
 import { Login } from "./Login";
 import { Register } from "./Register";
 import { login, register, checkToken } from "../utils/auth";
@@ -34,19 +34,6 @@ export const App = () => {
 
   const history = useHistory();
 
-  // useEffect(() => {
-  //   api.getAddingPictures()
-  //     .then(res => setCards(res))
-  //     .then(res=>console.log('cards', res))
-  //     .catch((err) => console.log(err))
-  // }, [])
-
-  // useEffect(() => {
-  //   api.getUserInfo()
-  //     .then(res => setCurrentUser(res))
-  //     .catch((err) => console.log(err))
-  // }, [])
-
   useEffect(() => {
     Promise.all([api.getAddingPictures(), api.getUserInfo()])
       .then(([cardsInfo, userInfo]) => {
@@ -54,7 +41,7 @@ export const App = () => {
         setCards(cardsInfo)
       })
       .catch((err) => console.log(err))
-  })
+  }, [])
 
   useEffect(() => {
     const token = localStorage.getItem("jwt")
@@ -126,7 +113,6 @@ export const App = () => {
   const handleCardLike = (card) => {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some(i => i._id === currentUser._id);
-
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
@@ -200,9 +186,6 @@ export const App = () => {
     history.push("/sign-in");
   }
 
-
-
-
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
@@ -231,7 +214,6 @@ export const App = () => {
               cards={cards}
               onCardLike={handleCardLike}
               onDeleteCard={handlePopupSubmitOpen}
-            // isLoadingInitialData={isLoadingInitialData}
             />
             <Route>
               {isSuccessLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}

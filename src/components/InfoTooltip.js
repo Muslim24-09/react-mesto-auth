@@ -3,11 +3,11 @@ import React from "react";
 import successIcon from "../images/success.svg";
 import failIcon from "../images/fail.svg";
 
-export const  InfoToolTip = ({isOpen, onClose, isSuccess}) =>  {
+export const InfoToolTip = ({ isOpen, onClose, isSuccess }) => {
   return (
-<div className={isOpen ? 'popup popup_opened' : 'popup'} >
+    <div className={isOpen ? 'popup popup_opened' : 'popup'} >
       <div className="popup__container popup__tooltip">
-				<button className="popup__close-button" title='Закрыть попап' onClick={onClose}></button>
+        <button className="popup__close-button" title='Закрыть попап' onClick={onClose}></button>
         {isSuccess ? (
           <>
             <img
@@ -31,7 +31,6 @@ export const  InfoToolTip = ({isOpen, onClose, isSuccess}) =>  {
             </p>
           </>
         )}
-
       </div>
     </div>
   );
