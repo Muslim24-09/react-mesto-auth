@@ -8,7 +8,6 @@ export const Sign = ({ btnClassName, title, btnText, onSubmit, messageIsRegister
 			</h2>
 			<form
 				className="auth__form"
-				noValidate
 				onSubmit={onSubmit}
 			>
 				{children}

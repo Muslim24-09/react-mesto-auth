@@ -16,6 +16,9 @@ import { Register } from "./Register";
 import { login, register, checkToken } from "../utils/auth";
 import { InfoToolTip } from './InfoTooltip';
 
+import successIcon from "../images/success.svg";
+import failIcon from "../images/fail.svg";
+
 
 export const App = () => {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
@@ -30,18 +33,23 @@ export const App = () => {
 
   const [isSuccessRegister, setIsSuccessRegister] = useState(false)
   const [isSuccessLoggedIn, setIsSuccessLoggedIn] = useState(false)
+  const [popupMessage, setPopupMessage] = useState('')
   const [email, setEmail] = useState('')
+  const [imageSrc, setImageSrc] = useState('')
 
   const history = useHistory();
 
   useEffect(() => {
-    Promise.all([api.getAddingPictures(), api.getUserInfo()])
-      .then(([cardsInfo, userInfo]) => {
-        setCurrentUser(userInfo)
-        setCards(cardsInfo)
-      })
-      .catch((err) => console.log(err))
-  }, [])
+    if (isSuccessLoggedIn) {
+      Promise.all([api.getAddingPictures(), api.getUserInfo()])
+        .then(([cardsInfo, userInfo]) => {
+          setCurrentUser(userInfo)
+          setCards(cardsInfo)
+        })
+        .catch((err) => console.log(err))
+    } else return;
+
+  }, [isSuccessLoggedIn])
 
   useEffect(() => {
     const token = localStorage.getItem("jwt")
@@ -152,6 +160,8 @@ export const App = () => {
         () => {
           setIsSuccessRegister(true);
           setInfoToolTipOpen(true)
+          setPopupMessage('Вы успешно зарегистрировались!')
+          setImageSrc(successIcon)
           history.push('/sign-in')
         })
       .catch((err) => {
@@ -159,6 +169,8 @@ export const App = () => {
           console.log("400 - некорректно заполнено одно из полей");
         }
         setIsSuccessRegister(false);
+        setPopupMessage('Что-то пошло не так. Попробуйте ещё раз!')
+        setImageSrc(failIcon)
         setInfoToolTipOpen(true)
       });
   }
@@ -172,6 +184,9 @@ export const App = () => {
         history.push('/');
       })
       .catch((err) => {
+        setImageSrc(failIcon)
+        setPopupMessage('Пользователь с таким логином/паролем не найден')
+        setInfoToolTipOpen(true)
         if (err.status === 400) {
           console.log("400 - не передано одно из полей");
         } else if (err.status === 401) {
@@ -231,7 +246,14 @@ export const App = () => {
             onClose={closeAllPopups}
             onDeleteCard={handleCardDelete}
             cardToDelete={itemToDelete} />
-            <InfoToolTip isOpen={isInfoToolTipOpen} onClose={closeAllPopups} isSuccess={isSuccessRegister} />
+          <InfoToolTip 
+          isOpen={isInfoToolTipOpen} 
+          onClose={closeAllPopups} 
+          isSuccess={isSuccessRegister} 
+          isSuccessLogin={isSuccessLoggedIn}
+          message={popupMessage}
+          imgSrc={imageSrc}
+           />
         </div>
       </div>
     </CurrentUserContext.Provider>
